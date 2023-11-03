@@ -9,10 +9,12 @@ import fr.ens.biologie.genomique.kenetre.log.StandardErrorLogger
 //logger = new StandardErrorLogger("stderr", [:])
 logger = new DummyLogger()
 
-def read_conf() {
+def read_conf(conf_path = null) {
 
     result = [:]
-    conf_path = System.getProperty("user.home") + "/.eoulsan-nf"
+    if (conf_path == null) {
+        conf_path = System.getProperty("user.home") + "/.eoulsan-nf"
+    }
 
     File conf_file = new File(conf_path)
 
