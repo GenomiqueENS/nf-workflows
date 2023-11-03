@@ -112,6 +112,7 @@ process EOULSAN_INDEX {
     // Get mapper instance
     mapperInstance = create_mapper_instance(mapperName, dirFile(tmpDir), dirFile(binaryDir), mapperVersion, mapperFlavor)
 
+    // A genome storage exists ?
     if (storages.containsKey("main.genome.mapper.index.storage.path")) {
 
         gd = get_genome_desc(genomeFile.toString(), storages)
@@ -125,12 +126,22 @@ process EOULSAN_INDEX {
         result = gis.get(mapperInstance, gd, additionalDescription)
 
         if (result != null) {
+            // An index already exist
+
             Files.createSymbolicLink(outIndexFile.toPath(), result.toPath())
             return
-        }     
-    }
+        } else {
+            // No existing index, must compute it
+            compute_index(genomeFile, outIndexFile, mapperInstance, indexerArguments, task.cpus, task.workDir)
 
-    compute_index(genomeFile, outIndexFile, mapperInstance, indexerArguments, task.cpus, task.workDir)
+            // Save index in storage
+            gis.put(mapperInstance, gd, additionalDescription, outIndexFile)
+        }
+    } else {
+
+        // No index storage just compute index
+        compute_index(genomeFile, outIndexFile, mapperInstance, indexerArguments, task.cpus, task.workDir)
+    }
 }
 
 process EOULSAN_MAPPING {
