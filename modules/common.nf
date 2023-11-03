@@ -33,6 +33,22 @@ def read_conf() {
 
 def get_path(p, storages) {
 
+    if (p==null) {
+        error "Error: undefined path"
+    }
+
+    if (!p instanceof String) {
+        error "Error: p must be a String"
+    }
+
+    if (storages==null) {
+        error "Error: undefined storage"
+    }
+
+    if (!p instanceof Map) {
+        error "Error: storage must be a Map"
+    }
+
     if (p.toLowerCase().startsWith("genome://") && storages.containsKey("main.genome.storage.path") ) {
         fs = new FileStorage(storages["main.genome.storage.path"], [".fasta", ".fa", ".fna"])
         return fs.getFile(p)
@@ -57,6 +73,14 @@ def create_channel_from_path(p, storages) {
 }
 
 def get_genome_desc(p, storages) {
+
+    if (p==null) {
+        error "Error: undefined path"
+    }
+
+    if (!p instanceof String) {
+        error "Error: p must be a String"
+    }
 
     if (storages == null) {
         return p
