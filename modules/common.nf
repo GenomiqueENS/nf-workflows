@@ -50,6 +50,12 @@ def get_path(p, storages) {
     return new File(p)
 }
 
+def create_channel_from_path(p, storages) {
+
+    unix_path = get_path(p, storages)
+    return Channel.value(unix_path.toPath())
+}
+
 def get_genome_desc(p, storages) {
 
     if (storages == null) {
@@ -81,4 +87,30 @@ def output_stream(p) {
 
     ct = CompressionType.getCompressionTypeByFile(p)
     return ct.create(p)
+}
+
+process UNCOMPRESS {
+    debug true
+
+    input:
+    path in
+
+    output:
+    path "${fr.ens.biologie.genomique.kenetre.util.StringUtils.removeCompressedExtensionFromFilename(in.getName())}"
+
+    script:
+    if (in.toString().toLowerCase().endsWith('.gz'))
+    """
+    zcat $in > "${fr.ens.biologie.genomique.kenetre.util.StringUtils.removeCompressedExtensionFromFilename(in.getName())}"
+    """
+
+    else if (in.toString().toLowerCase().endsWith('.bz2'))
+    """
+    bzcat $in > "${fr.ens.biologie.genomique.kenetre.util.StringUtils.removeCompressedExtensionFromFilename(in.getName())}"
+    """
+
+    else
+    """
+    ln -s $in "${fr.ens.biologie.genomique.kenetre.util.StringUtils.removeCompressedExtensionFromFilename(in.getName())}"
+    """
 }
