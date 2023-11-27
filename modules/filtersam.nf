@@ -1,6 +1,6 @@
 #!/usr/bin/env nextflow
 nextflow.enable.dsl=2
-
+params.OUTPUT = "result/eoulsan"
 import fr.ens.biologie.genomique.kenetre.util.LocalReporter
 import fr.ens.biologie.genomique.kenetre.bio.alignmentfilter.MultiReadAlignmentFilterBuilder
 import fr.ens.biologie.genomique.kenetre.bio.alignmentfilter.ReadAlignmentFilterBuffer
@@ -16,13 +16,15 @@ import htsjdk.samtools.SAMFileWriterFactory
  */
 process EOULSAN_SAM_FILTER {
  
+    publishDir( params.OUTPUT, mode: 'copy' )
+    
     input:
     val inSam
     val conf
     val tmpDir
  
     output:
-    path "filtered_${inSam.baseName}.sam"
+    path "${inSam.baseName}.sam", emit: filtered_sam
  
     exec:
 
@@ -30,7 +32,7 @@ process EOULSAN_SAM_FILTER {
     inSamFile = file(inSam)
 
     // Get out file object
-    outSamFile = task.workDir.resolve("filtered_${inSam.baseName}.sam")
+    outSamFile = task.workDir.resolve("${inSam.baseName}.sam")
 
     // Define the reporter
     reporter = new LocalReporter()

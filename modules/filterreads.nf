@@ -1,6 +1,6 @@
 #!/usr/bin/env nextflow
 nextflow.enable.dsl=2
-
+params.OUTPUT = "result/eoulsan"
 import java.io.File
 import fr.ens.biologie.genomique.kenetre.util.StringUtils
 import fr.ens.biologie.genomique.kenetre.io.CompressionType
@@ -15,7 +15,8 @@ import fr.ens.biologie.genomique.kenetre.bio.io.FastqWriter
 process EOULSAN_READ_FILTER_SR {
  
     debug true
-
+    publishDir( params.OUTPUT, mode: 'copy' )
+    
     input:
     val inFastq
     val conf
@@ -23,7 +24,7 @@ process EOULSAN_READ_FILTER_SR {
     output:
     //stdout
     //path outputFile
-    path "filtered_${inFastq.baseName}"
+    path "filtered_${inFastq.baseName}", emit: eoulsan_fasta
  
     exec:
     

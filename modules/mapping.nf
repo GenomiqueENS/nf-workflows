@@ -1,5 +1,6 @@
 #!/usr/bin/env nextflow
 nextflow.enable.dsl=2
+params.OUTPUT= "result/eoulsan"
 
 import static fr.ens.biologie.genomique.kenetre.util.StringUtils.filenameWithoutExtension
 
@@ -27,8 +28,8 @@ include { read_conf; get_path; get_genome_desc } from './common.nf'
 
 
 // The logger to use
-//logger = new StandardErrorLogger("stderr", [:])
-logger = new DummyLogger()
+logger = new StandardErrorLogger("stderr", [:])
+//logger = new DummyLogger()
 
 
 def create_mapper_instance(mapperName, tmpDir, binaryDir, mapperVersion, mapperFlavor) {
@@ -87,7 +88,8 @@ process EOULSAN_INDEX {
 
     maxForks 1
     cpus Runtime.runtime.availableProcessors()
-
+    publishDir( params.OUTPUT, mode: 'copy' )
+    
     input:
     val genome
     val mapperName
@@ -148,7 +150,8 @@ process EOULSAN_MAPPING {
 
     maxForks 1
     cpus Runtime.runtime.availableProcessors()
-
+    publishDir( params.OUTPUT, mode: 'copy' )
+    
     input:
     tuple val(inFastq), val(index)
     // val index
