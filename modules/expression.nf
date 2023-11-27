@@ -1,6 +1,8 @@
 #!/usr/bin/env nextflow
 nextflow.enable.dsl=2
 
+params.OUTPUT = "result/eoulsan"
+
 import fr.ens.biologie.genomique.kenetre.io.CompressionType
 import fr.ens.biologie.genomique.kenetre.util.LocalReporter
 import fr.ens.biologie.genomique.kenetre.bio.io.TSVCountsWriter
@@ -10,6 +12,8 @@ include { read_conf; get_path; get_genome_desc; input_stream; output_stream } fr
 
 process EOULSAN_EXPRESSION {
  
+    publishDir( params.OUTPUT, mode: 'copy' )
+    
     input:
     tuple val(inSam), val(annot), val(genome)
     // val inSam
