@@ -1,3 +1,4 @@
 # nf-workflows
+Nextflow worflow for transcript annotation of long-read sequencing using consensus annotated genome from Isoquant and RNA-Bloom tools.
 
-![Alt text](/home/brunon/Téléchargements/pipeline_transcript_annot.png?raw=true "Title")
+![pipeline_transcript_annot](https://github.com/GenomiqueENS/nf-workflows/assets/91611978/adc27193-365c-4b47-a44d-17b00d193ed2)
