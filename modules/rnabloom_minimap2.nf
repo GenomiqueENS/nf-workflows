@@ -15,6 +15,7 @@ process RNABLOOM_MINIMAP2 {
    // where to store the results and in which way
    debug true
    maxForks 1
+   cpus 24
    publishDir( params.OUTPUT, mode: 'copy' )
 
    // show in the log which input file is analysed
