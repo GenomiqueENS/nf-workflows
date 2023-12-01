@@ -14,6 +14,7 @@ params.OUTPUT = "result/isoquant"
 process ISOQUANT {
 
    // where to store the results and in which way
+   cpus 24
    publishDir( params.OUTPUT, mode: 'copy' )
 
    // show in the log which input file is analysed
@@ -26,7 +27,7 @@ process ISOQUANT {
 
    output:
    path( "result/isoquant/OUT/*.gtf" ), emit: isoquant_gtf
-
+   path( "result/isoquant/OUT/*" )
    
    script:
    """

@@ -11,6 +11,7 @@ params.OUTPUT = "result/rnabloom"
 process RNA_BLOOM {
    // where to store the results and in which way
    debug true
+   cpus 24
    publishDir( params.OUTPUT, mode: 'copy' )
 
    // show in the log which input file is analysed
@@ -22,6 +23,7 @@ process RNA_BLOOM {
 
    output:
    path( "rnabloom_assembly/*.transcripts.fa" ), emit: rnabloom_fasta
+   path( "rnabloom_assembly/*" )
    
    script:
    def shortread_arg = shortread.name != 'no_shortread' ? "-ser $shortread" : ""
