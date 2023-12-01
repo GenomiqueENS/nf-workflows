@@ -14,7 +14,7 @@ nextflow.enable.dsl=2
 println """\
         T R A N S C R I P T - A N N O T A T I O N - N F   P I P E L I N E
         ===================================
-        //genome      : ${params.ref}
+        genome      : ${params.genome}
         fastq       : ${params.reads}
         outdir      : ${params.outdir}
         """
@@ -40,8 +40,8 @@ include { RNABLOOM_MINIMAP2 } from './modules/rnabloom_minimap2.nf'
 include { RNABLOOM_PATHTOOLS } from './modules/rnabloom_pathtools.nf'
 include { RNABLOOM_AGAT } from './modules/agat.nf'
 include { SAMTOOLS } from './modules/samtools.nf'
-
 include { SAMTOOLS_MERGE } from './modules/samtools_merge.nf'
+
 /*
 ========================================================================================
    Create Channels
