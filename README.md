@@ -2,16 +2,18 @@
 This bioinformatic pipeline is used for transcript annotation of long-read sequencing data using consensus annotated transcriptome from Isoquant and RNA-Bloom tools.
 This workflow is written in nextflow and developped by the GenomiqueENS core facility of the Institute of Biology of the Ecole Normale Superieure (IBENS).
 
-![pipeline_transcript_annot](https://github.com/GenomiqueENS/nf-workflows/assets/91611978/76114ed4-c957-4ce5-96ab-f46720440ce3 |width=100)
+<p align="center" width="100%">
+    <img width="50%" src="https://github.com/GenomiqueENS/nf-workflows/assets/91611978/b568caf0-7345-47db-9d1c-cfed6cf79a9b">
+</p>
+
 
 Main workflow
 
 1. Define input section of nextflow.config file:
-     - Nanopore data
-     - Genome annotation
-     - Illumina short reads (optional)
+     - path to nanopore data
+     - path to genome annotation
+     - path to illumina short reads (optional)
 2. Read orientation (Eoulsan)
-
 3. RNA-Bloom subworkflow
      - Concatenate fastq files into single fastq (cat)
      - Transcript annotation (RNA-Bloom)
@@ -24,4 +26,5 @@ Main workflow
      - Convert sam to bam files (samtools)
      - Concatenate bam files into single bam (samtools)
      - Transcript annotation (Isoquant)
+6. Creation of consensus transcript annotation
    
