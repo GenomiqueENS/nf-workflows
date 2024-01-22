@@ -26,6 +26,7 @@ process RNA_BLOOM {
    path( "rnabloom_assembly/*" )
    
    script:
+   // argument for optional shortreads channel
    def shortread_arg = shortread.name != 'no_shortread' ? "-ser $shortread" : ""
    """
    rnabloom    \

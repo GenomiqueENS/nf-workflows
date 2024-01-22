@@ -28,11 +28,11 @@ println """\
 */
 
 include { read_conf; get_path; get_genome_desc; create_channel_from_path; UNCOMPRESS } from './modules/common.nf'
-include { EOULSAN_READ_FILTER_SR } from './modules/filterreads.nf'
-include { EOULSAN_INDEX } from './modules/mapping.nf'
-include { EOULSAN_MAPPING } from './modules/mapping.nf'
-include { EOULSAN_SAM_FILTER } from './modules/filtersam.nf'
-include { EOULSAN_EXPRESSION } from './modules/expression.nf'
+include { FILTER_READ } from './modules/filterreads.nf'
+include { INDEX_GENOME } from './modules/mapping.nf'
+include { READ_MAPPING } from './modules/mapping.nf'
+include { FILTER_SAM } from './modules/filtersam.nf'
+include { COMPUTE_EXPRESSION } from './modules/expression.nf'
 include { ISOQUANT } from './modules/isoquant.nf'
 include { MERGE_FASTQ } from './modules/merge_fastq.nf'
 include { RNA_BLOOM } from './modules/rnabloom.nf'
@@ -50,10 +50,11 @@ include { SAMTOOLS_MERGE } from './modules/samtools_merge.nf'
 genome_ch = Channel.of( params.genome )
 annot_ch = Channel.of( params.annotation )
 reads_ch = Channel.fromPath( params.reads, checkIfExists:true )
+// channel for optional short reads
 shortread_ch = params.optional_shortread != null ? file(params.optional_shortread, type: "file") : file("no_shortread", type: "file")
 
 
-// Pipeline Input parameters
+// Eoulsan modules input parameters
 params.mapperName = "minimap2"
 params.mapperVersion = "2.24"
 params.mapperFlavor = ""
@@ -75,30 +76,30 @@ params.expressionConf = [ "genomic.type" : "exon", "attribute.id" : "gene_id", "
 
 workflow {
   // Index creation
-  index_ch = EOULSAN_INDEX(genome_ch, params.mapperName, params.mapperVersion, params.mapperFlavor, params.storages, params.tmpDir, params.binaryDir, params.indexerArguments)
+  index_ch = INDEX_GENOME(genome_ch, params.mapperName, params.mapperVersion, params.mapperFlavor, params.storages, params.tmpDir, params.binaryDir, params.indexerArguments)
   genome_ch = create_channel_from_path(params.genome, params.storages)
   uncompress_ch = UNCOMPRESS(genome_ch)
   
   // Reads filtering
-  filterreads_ch = EOULSAN_READ_FILTER_SR(reads_ch, params.readFilteringConf)
+  filterreads_ch = FILTER_READ(reads_ch, params.readFilteringConf)
 
   // Mapping
   filterreads_ch.combine(index_ch).set { reads_index_combined_ch }
-  mapping_ch = EOULSAN_MAPPING(reads_index_combined_ch, params.mapperName, params.mapperVersion, params.mapperFlavor, params.tmpDir, params.binaryDir, params.mappersArguments)
+  mapping_ch = READ_MAPPING(reads_index_combined_ch, params.mapperName, params.mapperVersion, params.mapperFlavor, params.tmpDir, params.binaryDir, params.mappersArguments)
 
   // Alignments filtering
-  filtersam_ch = EOULSAN_SAM_FILTER(mapping_ch, params.samFilteringConf, params.tmpDir)
+  filtersam_ch = FILTER_SAM(mapping_ch, params.samFilteringConf, params.tmpDir)
 
   // Expression computation
   filtersam_ch.combine(annot_ch).combine(genome_ch).set { filtersam_annot_combined_ch }
-  expression_ch = EOULSAN_EXPRESSION(filtersam_annot_combined_ch, params.expressionConf, "True", params.storages)
+  expression_ch = COMPUTE_EXPRESSION(filtersam_annot_combined_ch, params.expressionConf, "True", params.storages)
   
-  // Launch transcript annotation modules
-  SAMTOOLS(EOULSAN_SAM_FILTER.out.filtered_sam)
+  // Launch transcript annotation modules: Isoquant + RNABloom
+  SAMTOOLS(FILTER_SAM.out.filtered_sam)
   SAMTOOLS_MERGE(SAMTOOLS.out.samtools_bam.collect())
   ISOQUANT(uncompress_ch, SAMTOOLS_MERGE.out.samtools_mergedbam)
   
-  MERGE_FASTQ(EOULSAN_READ_FILTER_SR.out.eoulsan_fasta.collect())
+  MERGE_FASTQ(FILTER_READ.out.eoulsan_fasta.collect())
   RNA_BLOOM(MERGE_FASTQ.out.merged_fastq, shortread_ch)
   RNABLOOM_MINIMAP2(uncompress_ch, RNA_BLOOM.out.rnabloom_fasta)
   RNABLOOM_PATHTOOLS(RNABLOOM_MINIMAP2.out.rnabloom_sam)
